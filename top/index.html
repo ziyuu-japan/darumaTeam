@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>IoT-Daruma</title>
+</head>
+<body>
+  <script src="https://mz4u.net/libs/gc2/polyfill.js"></script>
+  <script type="text/javascript">
+    (async ()  => {
+      // 一定時間待つ関数
+      var sleep = ms => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        };
+
+      var ws = new WebSocket("wss://10.0.128.210:3052/?room=test");
+      var gpioAccess = await navigator.requestGPIOAccess();
+      var port = gpioAccess.ports.get(26);
+
+      await port.export("out");
+
+      ws.onmessage = async message => {
+        if (message.data === "fire") {
+          port.write(1);
+          }
+        if (message.data === "stop") {
+          port.write(0);
+          }
+
+        console.log(message.data);
+      }
+    })();
+  </script>
+</body>
+</html>
